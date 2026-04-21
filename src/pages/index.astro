@@ -1,0 +1,202 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { profile } from "../data/profile";
+
+const commandData = {
+  help: [
+    "Comandos disponibles:",
+    "- stack: ver stack tecnologico que maneja",
+    "- trabajos: ver experiencia laboral",
+    "- links: ver links de ejemplo",
+    "- contacto: ver datos de contacto",
+    "- theme <green|amber|ice>: cambiar tema",
+    "- clear: limpiar terminal",
+  ],
+  stack: profile.skills.map((skill) => `- ${skill}`),
+  trabajos: profile.experience.map(
+    (item) => `- ${item.role} | ${item.company} | ${item.period}\n  ${item.detail}`,
+  ),
+  links: profile.workLinks.map((link) => `- ${link.label}: ${link.href}`),
+  contacto: [
+    `- nombre: ${profile.name}`,
+    `- email: ${profile.email}`,
+    `- linkedin: ${profile.linkedin}`,
+    `- ubicacion: ${profile.location}`,
+  ],
+} as const;
+---
+
+<BaseLayout
+  title={`${profile.name} | Terminal Portfolio`}
+  description="Portfolio interactivo en formato terminal bash."
+>
+  <main class="terminal-page" data-theme="green">
+    <section class="terminal-shell" aria-label="Terminal portfolio">
+      <header class="terminal-topbar">
+        <div class="window-controls" aria-hidden="true">
+          <span class="window-dot dot-close"></span>
+          <span class="window-dot dot-minimize"></span>
+          <span class="window-dot dot-expand"></span>
+        </div>
+
+        <div class="terminal-meta">
+          <span>{profile.name.toLowerCase().replaceAll(" ", "")}@portfolio</span>
+          <span>bash</span>
+        </div>
+
+        <div class="theme-switcher" aria-label="Seleccionar tema">
+          <button class="theme-button is-active" data-theme-choice="green" type="button">
+            Green
+          </button>
+          <button class="theme-button" data-theme-choice="amber" type="button">
+            Amber
+          </button>
+          <button class="theme-button" data-theme-choice="ice" type="button">
+            Ice
+          </button>
+        </div>
+      </header>
+
+      <section class="terminal-screen">
+        <div class="screen-output" data-output>
+          <div class="output-block">
+            <span class="output-line">escribi 'help' para comenzar</span>
+          </div>
+        </div>
+
+        <form class="terminal-form" data-terminal-form>
+          <label class="sr-only" for="terminal-input">Comando de terminal</label>
+          <span class="prompt">
+            <span class="prompt-user">juan@portfolio</span>
+            <span class="prompt-separator">:</span>
+            <span class="prompt-path">~</span>
+            <span class="prompt-separator">$</span>
+          </span>
+          <input
+            id="terminal-input"
+            class="terminal-input"
+            name="command"
+            type="text"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            autofocus
+          />
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <script
+    type="application/json"
+    id="terminal-command-data"
+    set:html={JSON.stringify(commandData)}
+  ></script>
+
+  <script is:inline>
+    const root = document.querySelector(".terminal-page");
+    const form = document.querySelector("[data-terminal-form]");
+    const input = document.querySelector("#terminal-input");
+    const output = document.querySelector("[data-output]");
+    const themeButtons = Array.from(document.querySelectorAll("[data-theme-choice]"));
+    const dataNode = document.querySelector("#terminal-command-data");
+    const commands = dataNode ? JSON.parse(dataNode.textContent || "{}") : {};
+
+    const appendBlock = (lines, command) => {
+      if (!output) return;
+
+      const block = document.createElement("div");
+      block.className = "output-block";
+
+      if (command) {
+        const commandLine = document.createElement("div");
+        commandLine.className = "command-line";
+        commandLine.innerHTML =
+          '<span class="prompt"><span class="prompt-user">juan@portfolio</span><span class="prompt-separator">:</span><span class="prompt-path">~</span><span class="prompt-separator">$</span></span>';
+
+        const commandText = document.createElement("span");
+        commandText.className = "command-text";
+        commandText.textContent = command;
+        commandLine.append(commandText);
+        block.append(commandLine);
+      }
+
+      lines.forEach((line) => {
+        const lineNode = document.createElement("p");
+        lineNode.className = "output-line";
+        lineNode.textContent = line;
+        block.append(lineNode);
+      });
+
+      output.append(block);
+      output.scrollTop = output.scrollHeight;
+    };
+
+    const setTheme = (theme) => {
+      if (!root) return;
+
+      root.dataset.theme = theme;
+      themeButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.themeChoice === theme);
+      });
+    };
+
+    themeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const theme = button.dataset.themeChoice;
+        if (!theme) return;
+        setTheme(theme);
+        appendBlock([`tema activo: ${theme}`], `theme ${theme}`);
+        input?.focus();
+      });
+    });
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!input) return;
+
+      const rawValue = input.value.trim();
+      if (!rawValue) return;
+
+      const [baseCommand, ...rest] = rawValue.toLowerCase().split(/\s+/);
+      const args = rest;
+
+      if (baseCommand === "clear") {
+        output.innerHTML = "";
+        input.value = "";
+        return;
+      }
+
+      if (baseCommand === "theme") {
+        const selectedTheme = args[0];
+        const availableThemes = ["green", "amber", "ice"];
+
+        if (selectedTheme && availableThemes.includes(selectedTheme)) {
+          setTheme(selectedTheme);
+          appendBlock([`tema activo: ${selectedTheme}`], rawValue);
+        } else {
+          appendBlock(
+            ["uso: theme <green|amber|ice>"],
+            rawValue,
+          );
+        }
+
+        input.value = "";
+        return;
+      }
+
+      const response = commands[baseCommand];
+
+      if (response) {
+        appendBlock(response.flatMap((line) => line.split("\n")), rawValue);
+      } else {
+        appendBlock(
+          ["comando no reconocido. escribi 'help' para ver opciones."],
+          rawValue,
+        );
+      }
+
+      input.value = "";
+    });
+  </script>
+</BaseLayout>

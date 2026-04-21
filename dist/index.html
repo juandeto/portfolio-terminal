@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Portfolio interactivo en formato terminal bash."><title>Juan De Tomaso | Terminal Portfolio</title><link rel="stylesheet" href="/_astro/index.VZID1Aew.css"></head> <body>  <main class="terminal-page" data-theme="green"> <section class="terminal-shell" aria-label="Terminal portfolio"> <header class="terminal-topbar"> <div class="window-controls" aria-hidden="true"> <span class="window-dot dot-close"></span> <span class="window-dot dot-minimize"></span> <span class="window-dot dot-expand"></span> </div> <div class="terminal-meta"> <span>juandetomaso@portfolio</span> <span>bash</span> </div> <div class="theme-switcher" aria-label="Seleccionar tema"> <button class="theme-button is-active" data-theme-choice="green" type="button">
+Green
+</button> <button class="theme-button" data-theme-choice="amber" type="button">
+Amber
+</button> <button class="theme-button" data-theme-choice="ice" type="button">
+Ice
+</button> </div> </header> <section class="terminal-screen"> <div class="screen-output" data-output> <div class="output-block"> <span class="output-line">escribi 'help' para comenzar</span> </div> </div> <form class="terminal-form" data-terminal-form> <label class="sr-only" for="terminal-input">Comando de terminal</label> <span class="prompt"> <span class="prompt-user">juan@portfolio</span> <span class="prompt-separator">:</span> <span class="prompt-path">~</span> <span class="prompt-separator">$</span> </span> <input id="terminal-input" class="terminal-input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus> </form> </section> </section> </main> <script type="application/json" id="terminal-command-data">{"help":["Comandos disponibles:","- stack: ver stack tecnologico que maneja","- trabajos: ver experiencia laboral","- links: ver links de ejemplo","- contacto: ver datos de contacto","- theme <green|amber|ice>: cambiar tema","- clear: limpiar terminal"],"stack":["- React","- TypeScript","- Next.js","- Astro","- JavaScript","- Redux","- Jest","- Tailwind CSS","- Sass","- Figma","- GraphQL","- Node.js","- PostgreSQL","- Python","- User Experience Design","- User Interface Design"],"trabajos":["- Frontend Developer | Remitz, Inc. | November 2024 - February 2025\n  Recent frontend role focused on software product development and delivery.","- Fullstack Developer | Making Sense LLC | September 2023 - November 2024\n  Fullstack product work combining frontend execution with backend collaboration.","- Frontend Developer | Poglinar | June 2022 - November 2023\n  Optimized and updated legacy code for the Cradle website relaunch, improving performance, pagination, content filtering and SEO-oriented UI delivery for a high-traffic experience."],"links":["- BK Comp: https://bk-comp.com","- Legacy Car Tour: https://legacycartour.com/","- La Sastreria Congreso: https://www.lasastreria.com.ar/indicecongreso/#/app","- LinkedIn: https://www.linkedin.com/in/juandetomaso","- Resume PDF: /Profile.pdf"],"contacto":["- nombre: Juan De Tomaso","- email: juandeto10@gmail.com","- linkedin: https://www.linkedin.com/in/juandetomaso","- ubicacion: Buenos Aires, Argentina"]}</script> <script>
+    const root = document.querySelector(".terminal-page");
+    const form = document.querySelector("[data-terminal-form]");
+    const input = document.querySelector("#terminal-input");
+    const output = document.querySelector("[data-output]");
+    const themeButtons = Array.from(document.querySelectorAll("[data-theme-choice]"));
+    const dataNode = document.querySelector("#terminal-command-data");
+    const commands = dataNode ? JSON.parse(dataNode.textContent || "{}") : {};
+
+    const appendBlock = (lines, command) => {
+      if (!output) return;
+
+      const block = document.createElement("div");
+      block.className = "output-block";
+
+      if (command) {
+        const commandLine = document.createElement("div");
+        commandLine.className = "command-line";
+        commandLine.innerHTML =
+          '<span class="prompt"><span class="prompt-user">juan@portfolio</span><span class="prompt-separator">:</span><span class="prompt-path">~</span><span class="prompt-separator">$</span></span>';
+
+        const commandText = document.createElement("span");
+        commandText.className = "command-text";
+        commandText.textContent = command;
+        commandLine.append(commandText);
+        block.append(commandLine);
+      }
+
+      lines.forEach((line) => {
+        const lineNode = document.createElement("p");
+        lineNode.className = "output-line";
+        lineNode.textContent = line;
+        block.append(lineNode);
+      });
+
+      output.append(block);
+      output.scrollTop = output.scrollHeight;
+    };
+
+    const setTheme = (theme) => {
+      if (!root) return;
+
+      root.dataset.theme = theme;
+      themeButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.themeChoice === theme);
+      });
+    };
+
+    themeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const theme = button.dataset.themeChoice;
+        if (!theme) return;
+        setTheme(theme);
+        appendBlock([`tema activo: ${theme}`], `theme ${theme}`);
+        input?.focus();
+      });
+    });
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!input) return;
+
+      const rawValue = input.value.trim();
+      if (!rawValue) return;
+
+      const [baseCommand, ...rest] = rawValue.toLowerCase().split(/\s+/);
+      const args = rest;
+
+      if (baseCommand === "clear") {
+        output.innerHTML = "";
+        input.value = "";
+        return;
+      }
+
+      if (baseCommand === "theme") {
+        const selectedTheme = args[0];
+        const availableThemes = ["green", "amber", "ice"];
+
+        if (selectedTheme && availableThemes.includes(selectedTheme)) {
+          setTheme(selectedTheme);
+          appendBlock([`tema activo: ${selectedTheme}`], rawValue);
+        } else {
+          appendBlock(
+            ["uso: theme <green|amber|ice>"],
+            rawValue,
+          );
+        }
+
+        input.value = "";
+        return;
+      }
+
+      const response = commands[baseCommand];
+
+      if (response) {
+        appendBlock(response.flatMap((line) => line.split("\n")), rawValue);
+      } else {
+        appendBlock(
+          ["comando no reconocido. escribi 'help' para ver opciones."],
+          rawValue,
+        );
+      }
+
+      input.value = "";
+    });
+  </script>  </body></html>
