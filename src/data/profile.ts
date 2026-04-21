@@ -31,25 +31,39 @@ export const profile = {
   ],
   experience: [
     {
-      company: "Remitz, Inc.",
-      role: "Frontend Developer",
-      period: "November 2024 - February 2025",
+      company: "G2i",
+      role: "Software Engineer",
+      period: "November 2025 - Present",
       detail:
-        "Recent frontend role focused on software product development and delivery.",
+        "Contributing to AI initiatives for a leading Frontier Lab, applying software engineering expertise to help shape next-generation AI products.",
     },
     {
       company: "Making Sense LLC",
       role: "Fullstack Developer",
-      period: "September 2023 - November 2024",
+      period: "November 2023 - October 2024",
       detail:
-        "Fullstack product work combining frontend execution with backend collaboration.",
+        "Led development of the Gramercy mental health MVP from scratch, building Auth0 auth flows, Square payments, scheduling APIs, Terraform infrastructure, i18n, dashboards, and onboarding experiences.",
     },
     {
-      company: "Poglinar",
+      company: "Crackle",
       role: "Frontend Developer",
-      period: "June 2022 - November 2023",
+      period: "June 2022 - August 2023",
       detail:
-        "Optimized and updated legacy code for the Cradle website relaunch, improving performance, pagination, content filtering and SEO-oriented UI delivery for a high-traffic experience.",
+        "Improved Smart TV app performance with React Query, boosting CLS by 40%, and optimized SEO plus social-facing website card experiences for the new launch.",
+    },
+    {
+      company: "Crystal Zoom",
+      role: "Frontend Developer",
+      period: "December 2021 - May 2022",
+      detail:
+        "Built recommendation experiences for MercadoLibre sellers in React and developed Node.js/Express endpoints to sync campaign data with external ad platforms.",
+    },
+    {
+      company: "UMA Health",
+      role: "Frontend Developer",
+      period: "March 2020 - November 2021",
+      detail:
+        "Led post-MVP product development for a doctor-patient platform, combining user research with doctors and patients, Medikit SDK integrations, NLP-backed Flask services, calendar sync, and real-time chat.",
     },
   ],
   workLinks: [
