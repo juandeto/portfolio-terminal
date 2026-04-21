@@ -16,7 +16,9 @@ const commandData = {
   trabajos: profile.experience.map(
     (item) => `- ${item.role} | ${item.company} | ${item.period}\n  ${item.detail}`,
   ),
-  links: profile.workLinks.map((link) => `- ${link.label}: ${link.href}`),
+  links: profile.workLinks.map((link) => ({
+    html: `- ${link.label}: <a href="${link.href}" target="_blank" rel="noopener noreferrer">${link.href}</a>`,
+  })),
   contacto: [
     `- nombre: ${profile.name}`,
     `- email: ${profile.email}`,
@@ -102,6 +104,14 @@ const commandData = {
     const dataNode = document.querySelector("#terminal-command-data");
     const commands = dataNode ? JSON.parse(dataNode.textContent || "{}") : {};
 
+    const scrollTerminalToBottom = () => {
+      requestAnimationFrame(() => {
+        if (output) {
+          output.scrollTop = output.scrollHeight;
+        }
+      });
+    };
+
     const appendBlock = (lines, command) => {
       if (!output) return;
 
@@ -124,12 +134,18 @@ const commandData = {
       lines.forEach((line) => {
         const lineNode = document.createElement("p");
         lineNode.className = "output-line";
-        lineNode.textContent = line;
+
+        if (typeof line === "string") {
+          lineNode.textContent = line;
+        } else if (line?.html) {
+          lineNode.innerHTML = line.html;
+        }
+
         block.append(lineNode);
       });
 
       output.append(block);
-      output.scrollTop = output.scrollHeight;
+      scrollTerminalToBottom();
     };
 
     const setTheme = (theme) => {
@@ -164,6 +180,8 @@ const commandData = {
       if (baseCommand === "clear") {
         output.innerHTML = "";
         input.value = "";
+        scrollTerminalToBottom();
+        input.focus();
         return;
       }
 
@@ -182,13 +200,19 @@ const commandData = {
         }
 
         input.value = "";
+        input.focus();
         return;
       }
 
       const response = commands[baseCommand];
 
       if (response) {
-        appendBlock(response.flatMap((line) => line.split("\n")), rawValue);
+        appendBlock(
+          response.flatMap((line) =>
+            typeof line === "string" ? line.split("\n") : [line],
+          ),
+          rawValue,
+        );
       } else {
         appendBlock(
           ["comando no reconocido. escribi 'help' para ver opciones."],
@@ -197,6 +221,18 @@ const commandData = {
       }
 
       input.value = "";
+      scrollTerminalToBottom();
+      input.focus();
     });
+
+    if (output) {
+      const observer = new MutationObserver(() => {
+        scrollTerminalToBottom();
+      });
+
+      observer.observe(output, {
+        childList: true,
+      });
+    }
   </script>
 </BaseLayout>
