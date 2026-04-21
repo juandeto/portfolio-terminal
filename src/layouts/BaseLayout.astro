@@ -1,12 +1,31 @@
 ---
 import "../styles/global.css";
+import { profile } from "../data/profile";
 
 interface Props {
   title: string;
   description: string;
+  image?: string;
+  type?: "website" | "article";
+  keywords?: string[];
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  image = "/favicon.svg",
+  type = "website",
+  keywords = [
+    profile.name,
+    profile.title,
+    ...profile.skills.slice(0, 8),
+  ],
+} = Astro.props;
+
+const canonicalUrl = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : undefined;
+const imageUrl = Astro.site ? new URL(image, Astro.site).toString() : image;
 ---
 
 <!doctype html>
@@ -15,6 +34,27 @@ const { title, description } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="robots" content="index,follow" />
+    <meta name="author" content={profile.name} />
+    <meta name="keywords" content={keywords.join(", ")} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#08110d" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:site_name" content={`${profile.name} Portfolio`} />
+    <meta property="og:locale" content="es_AR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
     <title>{title}</title>
   </head>
   <body>
