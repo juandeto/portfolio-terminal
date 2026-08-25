@@ -4,33 +4,33 @@ import { profile } from "../data/profile";
 
 const commandData = {
   help: [
-    "Comandos disponibles:",
-    "- stack: ver stack tecnologico que maneja",
-    "- trabajos: ver experiencia laboral",
-    "- links: ver links de ejemplo",
-    "- contacto: ver datos de contacto",
-    "- theme <green|amber|ice>: cambiar tema",
-    "- clear: limpiar terminal",
+    "Available commands:",
+    "- stack: view tech stack",
+    "- jobs: view work experience",
+    "- links: view example links",
+    "- contact: view contact info",
+    "- theme <green|amber|ice>: change theme",
+    "- clear: clear terminal",
   ],
   stack: profile.skills.map((skill) => `- ${skill}`),
-  trabajos: profile.experience.map(
+  jobs: profile.experience.map(
     (item) => `- ${item.role} | ${item.company} | ${item.period}\n  ${item.detail}`,
   ),
   links: profile.workLinks.map((link) => ({
     html: `- ${link.label}: <a href="${link.href}" target="_blank" rel="noopener noreferrer">${link.href}</a>`,
   })),
-  contacto: [
-    `- nombre: ${profile.name}`,
+  contact: [
+    `- name: ${profile.name}`,
     `- email: ${profile.email}`,
     `- linkedin: ${profile.linkedin}`,
-    `- ubicacion: ${profile.location}`,
+    `- location: ${profile.location}`,
   ],
 } as const;
 ---
 
 <BaseLayout
   title={`${profile.name} | Terminal Portfolio`}
-  description="Portfolio interactivo de Juan De Tomaso, Frontend Developer especializado en React, TypeScript, Next.js y Astro."
+  description="Interactive portfolio of Juan De Tomaso, Frontend Developer specializing in React, TypeScript, Next.js, and Astro."
 >
   <main class="terminal-page" data-theme="green">
     <section class="terminal-shell" aria-label="Terminal portfolio">
@@ -46,7 +46,7 @@ const commandData = {
           <span>bash</span>
         </div>
 
-        <div class="theme-switcher" aria-label="Seleccionar tema">
+        <div class="theme-switcher" aria-label="Select theme">
           <button class="theme-button is-active" data-theme-choice="green" type="button">
             Green
           </button>
@@ -62,12 +62,12 @@ const commandData = {
       <section class="terminal-screen">
         <div class="screen-output" data-output>
           <div class="output-block">
-            <span class="output-line">escribi 'help' para comenzar</span>
+            <span class="output-line">type 'help' to get started</span>
           </div>
         </div>
 
         <form class="terminal-form" data-terminal-form>
-          <label class="sr-only" for="terminal-input">Comando de terminal</label>
+          <label class="sr-only" for="terminal-input">Terminal command</label>
           <span class="prompt">
             <span class="prompt-user">juan@portfolio</span>
             <span class="prompt-separator">:</span>
@@ -162,7 +162,7 @@ const commandData = {
         const theme = button.dataset.themeChoice;
         if (!theme) return;
         setTheme(theme);
-        appendBlock([`tema activo: ${theme}`], `theme ${theme}`);
+        appendBlock([`active theme: ${theme}`], `theme ${theme}`);
         input?.focus();
       });
     });
@@ -191,10 +191,10 @@ const commandData = {
 
         if (selectedTheme && availableThemes.includes(selectedTheme)) {
           setTheme(selectedTheme);
-          appendBlock([`tema activo: ${selectedTheme}`], rawValue);
+          appendBlock([`active theme: ${selectedTheme}`], rawValue);
         } else {
           appendBlock(
-            ["uso: theme <green|amber|ice>"],
+            ["usage: theme <green|amber|ice>"],
             rawValue,
           );
         }
@@ -215,7 +215,7 @@ const commandData = {
         );
       } else {
         appendBlock(
-          ["comando no reconocido. escribi 'help' para ver opciones."],
+          ["unrecognized command. type 'help' to see options."],
           rawValue,
         );
       }

@@ -29,7 +29,7 @@ const imageUrl = Astro.site ? new URL(image, Astro.site).toString() : image;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,7 +49,7 @@ const imageUrl = Astro.site ? new URL(image, Astro.site).toString() : image;
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:image" content={imageUrl} />
     <meta property="og:site_name" content={`${profile.name} Portfolio`} />
-    <meta property="og:locale" content="es_AR" />
+    <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
